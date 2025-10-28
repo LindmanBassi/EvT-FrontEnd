@@ -1,0 +1,27 @@
+.authContainer{
+  max-width:420px;
+  margin:40px auto;
+  padding:22px;
+  border-radius: var(--radius);
+  background: var(--cor-card);
+  box-shadow: var(--sombra-leve);
+  border: 1px solid var(--cor-borda);
+}
+
+.title{ text-align:center; font-size:20px; margin-bottom:12px; color:var(--cor-texto); font-weight:700 }
+
+.form{ display:flex; flex-direction:column; gap:12px }
+
+.label{ font-weight:600; color:var(--cor-texto); font-size:14px }
+
+.input{
+  width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--cor-borda);
+  background: transparent; color:inherit; outline:none;
+}
+.input:focus{ box-shadow: var(--sombra-foco); border-color: var(--cor-primaria) }
+
+.submit{ padding:10px 12px; border-radius:8px; background:var(--cor-sucesso); color:white; font-weight:700; border:none; cursor:pointer }
+.submit:disabled{ opacity:0.7; cursor:not-allowed }
+
+.switchRow{ text-align:center; margin-top:8px }
+.switchButton{ background:none; border:none; color:var(--cor-primaria); cursor:pointer; text-decoration:underline }
