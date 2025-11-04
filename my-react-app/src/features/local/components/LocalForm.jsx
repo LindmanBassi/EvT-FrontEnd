@@ -10,6 +10,7 @@ function LocalComponent() {
     iniciarEdicao,
     handleDeletar,
     localEditando,
+    handleBuscarCep,
   } = useLocal();
 
   return (
@@ -30,42 +31,27 @@ function LocalComponent() {
 
         <fieldset>
           <legend>Endereço</legend>
-          <label>
-            Rua:
-            <input
-              type="text"
-              name="rua"
-              value={formData.endereco.rua}
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            Bairro:
-            <input
-              type="text"
-              name="bairro"
-              value={formData.endereco.bairro}
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            Cidade:
-            <input
-              type="text"
-              name="cidade"
-              value={formData.endereco.cidade}
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            Estado:
-            <input
-              type="text"
-              name="estado"
-              value={formData.endereco.estado}
-              onChange={handleChange}
-            />
-          </label>
+          <div className="cep-container">
+            <label>
+              CEP:
+              <div className="cep-input-container">
+                <input
+                  type="text"
+                  name="cep"
+                  value={formData.endereco.cep}
+                  onChange={handleChange}
+                  placeholder="00000-000"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleBuscarCep(formData.endereco.cep)}
+                >
+                  Buscar CEP
+                </button>
+              </div>
+            </label>
+          </div>
+
           <label>
             Número:
             <input
@@ -75,13 +61,48 @@ function LocalComponent() {
               onChange={handleChange}
             />
           </label>
+
           <label>
-            CEP:
+            Rua:
             <input
               type="text"
-              name="cep"
-              value={formData.endereco.cep}
-              onChange={handleChange}
+              name="rua"
+              value={formData.endereco.rua}
+              readOnly
+              className="readonly-field"
+            />
+          </label>
+
+          <label>
+            Bairro:
+            <input
+              type="text"
+              name="bairro"
+              value={formData.endereco.bairro}
+              readOnly
+              className="readonly-field"
+            />
+          </label>
+
+          <label>
+            Cidade:
+            <input
+              type="text"
+              name="cidade"
+              value={formData.endereco.cidade}
+              readOnly
+              className="readonly-field"
+            />
+          </label>
+
+          <label>
+            Estado:
+            <input
+              type="text"
+              name="estado"
+              value={formData.endereco.estado}
+              readOnly
+              className="readonly-field"
             />
           </label>
         </fieldset>

@@ -25,7 +25,7 @@ export function useAuth() {
     try {
       if (isLogin) {
         await loginUsuario(formData.email, formData.senha);
-        navigate('/locais');
+        navigate('/home');
       } else {
         await cadastrarUsuario({
           nome: formData.nome,

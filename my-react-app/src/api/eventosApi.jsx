@@ -8,6 +8,14 @@ export async function getEventos() {
   return res.json();
 }
 
+export async function getEvento(id) {
+  const res = await fetch(buildUrl(`/eventos/${id}`), {
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Erro ao buscar evento');
+  return res.json();
+}
+
 export async function editarEvento(id, evento) {
   const res = await fetch(buildUrl(`/eventos/${id}`), {
     method: 'PUT',
