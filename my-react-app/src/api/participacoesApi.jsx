@@ -1,5 +1,7 @@
+import { buildUrl } from './apiConfig';
+
 export async function participarEvento(cpfUsuario, tituloEvento) {
-  const res = await fetch('http://localhost:8080/participacoes', {
+  const res = await fetch(buildUrl('/participacoes'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -11,7 +13,7 @@ export async function participarEvento(cpfUsuario, tituloEvento) {
 
 export async function getParticipantesDoEvento(eventoId) {
   const res = await fetch(
-    `http://localhost:8080/participacoes/evento/${eventoId}/usuarios`,
+    buildUrl(`/participacoes/evento/${eventoId}/usuarios`),
     {
       credentials: 'include',
     },

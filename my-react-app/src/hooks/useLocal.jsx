@@ -4,7 +4,7 @@ import {
   getLocais,
   editarLocal,
   deletarLocal,
-} from '../services/localService';
+} from '../api/localApi';
 
 export function useLocal() {
   const [formData, setFormData] = useState({
@@ -27,7 +27,10 @@ export function useLocal() {
     async function fetchLocais() {
       try {
         const data = await getLocais();
-        setLocais(data);
+        const normalized = Array.isArray(data)
+          ? data.map((l, i) => ({ ...l, id: l.id ?? l._id ?? `tmp-${i}` }))
+          : [];
+        setLocais(normalized);
       } catch (err) {
         console.error(err);
       }
@@ -51,14 +54,31 @@ export function useLocal() {
     e.preventDefault();
     try {
       if (localEditando) {
-        const atualizado = await editarLocal(localEditando.id, formData);
-        setLocais((prev) =>
-          prev.map((l) => (l.id === atualizado.id ? atualizado : l)),
-        );
+        await editarLocal(localEditando.id, formData);
+        // Após editar, recarrega a lista do servidor para garantir dados atualizados
+        const data = await getLocais();
+        const normalized = Array.isArray(data)
+          ? data.map((l, i) => ({ ...l, id: l.id ?? l._id ?? `tmp-${i}` }))
+          : [];
+        setLocais(normalized);
         setLocalEditando(null);
       } else {
-        const novoLocal = await criarLocal(formData);
-        setLocais((prev) => [...prev, novoLocal]);
+        const payload = {
+          ...formData,
+          endereco: {
+            ...formData.endereco,
+            cep: String(formData.endereco?.cep ?? ''),
+          },
+        };
+        await criarLocal(payload);
+        const atualizados = await getLocais();
+        const normalized = Array.isArray(atualizados)
+          ? atualizados.map((l, i) => ({
+              ...l,
+              id: l.id ?? l._id ?? `tmp-${i}`,
+            }))
+          : [];
+        setLocais(normalized);
       }
 
       setFormData({

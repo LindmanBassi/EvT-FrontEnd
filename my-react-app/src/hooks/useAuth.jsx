@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUsuario, cadastrarUsuario } from '../services/authService';
+import { loginUsuario } from '../api/authApi';
+import { criarUsuario as cadastrarUsuario } from '../api/usuariosApi';
 
 export function useAuth() {
   const [isLogin, setIsLogin] = useState(true);
