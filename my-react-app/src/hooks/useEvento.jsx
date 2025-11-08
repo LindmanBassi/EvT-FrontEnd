@@ -4,8 +4,8 @@ import {
   getEventos,
   editarEvento,
   deletarEvento,
-} from '../api/eventosApi';
-import { getUsuarios } from '../api/usuariosApi';
+} from '../api/eventoApi';
+import { getUsuarios } from '../api/usuarioApi';
 import { getLocais } from '../api/localApi';
 
 export function useEvent() {
@@ -24,6 +24,8 @@ export function useEvent() {
   const [eventoEditando, setEventoEditando] = useState(null);
   const [usuarios, setUsuarios] = useState([]);
   const [locais, setLocais] = useState([]);
+  const [mensagemErro, setMensagemErro] = useState('');
+  const [erros, setErros] = useState({});
 
   useEffect(() => {
     async function fetchData() {
@@ -61,7 +63,7 @@ export function useEvent() {
             : [],
         );
       } catch (err) {
-        console.error(err);
+        console.error('Erro ao carregar dados iniciais:', err);
       }
     }
     fetchData();
@@ -76,7 +78,7 @@ export function useEvent() {
           : [];
         setEventos(normalized);
       } catch (err) {
-        console.error(err);
+        console.error('Erro ao carregar eventos:', err);
       }
     }
     fetchEventos();
@@ -84,8 +86,18 @@ export function useEvent() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'estadoEvento') return;
+
+    if (name === 'tipoEvento' && value === 'REMOTO') {
+      setFormData((prev) => ({
+        ...prev,
+        tipoEvento: value,
+        localId: '',
+      }));
+      return;
+    }
+
     if (name === 'vagas' || name === 'localId' || name === 'palestranteId') {
-      // Converter para número se não estiver vazio
       const numValue = value === '' ? '' : parseInt(value, 10);
       setFormData((prev) => ({ ...prev, [name]: numValue }));
     } else {
@@ -95,33 +107,38 @@ export function useEvent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMensagemErro('');
+    setErros({});
+
     try {
-      const payload = {
+      let payload = {
         ...formData,
         vagas: Number(formData.vagas) || 1,
-        localId: Number(formData.localId) || 0,
         palestranteId: Number(formData.palestranteId) || 0,
+        estadoEvento: 'ABERTO',
       };
+
+      if (payload.tipoEvento === 'REMOTO') {
+        payload.localId = null;
+      } else {
+        payload.localId = Number(formData.localId) || 0;
+      }
 
       if (eventoEditando) {
         await editarEvento(eventoEditando.id, payload);
-        const data = await getEventos();
-        const normalized = Array.isArray(data)
-          ? data.map((e, i) => ({ ...e, id: e.id ?? e._id ?? `tmp-${i}` }))
-          : [];
-        setEventos(normalized);
-        setEventoEditando(null);
       } else {
         await criarEvento(payload);
-        const atualizados = await getEventos();
-        const normalized = Array.isArray(atualizados)
-          ? atualizados.map((e, i) => ({
-              ...e,
-              id: e.id ?? e._id ?? `tmp-${i}`,
-            }))
-          : [];
-        setEventos(normalized);
       }
+
+      const atualizados = await getEventos();
+      const normalized = Array.isArray(atualizados)
+        ? atualizados.map((e, i) => ({
+            ...e,
+            id: e.id ?? e._id ?? `tmp-${i}`,
+          }))
+        : [];
+      setEventos(normalized);
+      setEventoEditando(null);
 
       setFormData({
         localId: '',
@@ -133,9 +150,31 @@ export function useEvent() {
         vagas: '',
         palestranteId: '',
       });
-    } catch (error) {
-      console.error(error);
-      alert('Erro ao salvar evento.');
+    } catch (err) {
+      console.error('Erro ao salvar evento:', err);
+
+      let data = null;
+      if (err instanceof Response) {
+        try {
+          data = await err.json();
+        } catch (_) {
+          data = null;
+        }
+      }
+
+      if (data) {
+        if (data.erros && typeof data.erros === 'object') {
+          setErros(data.erros);
+          const msg = data.mensagem || Object.values(data.erros)[0];
+          setMensagemErro(msg);
+        } else if (data.mensagem) {
+          setMensagemErro(data.mensagem);
+        } else {
+          setMensagemErro('Resposta de erro inesperada do servidor.');
+        }
+      } else {
+        setMensagemErro('Erro de conexão com o servidor.');
+      }
     }
   };
 
@@ -143,9 +182,11 @@ export function useEvent() {
     setEventoEditando(evento);
     setFormData({
       ...evento,
-      localId: evento.local?.id || evento.localId, // Garantir que o localId seja corretamente preenchido
-      data: new Date(evento.data).toISOString().slice(0, 16), // Formato para datetime-local
+      localId: evento.localId || evento.local?.id || '',
+      data: new Date(evento.data).toISOString().slice(0, 16),
     });
+    setMensagemErro('');
+    setErros({});
   };
 
   const handleDeletar = async (id) => {
@@ -154,7 +195,7 @@ export function useEvent() {
       setEventos((prev) => prev.filter((e) => e.id !== id));
     } catch (err) {
       console.error(err);
-      alert('Erro ao deletar evento.');
+      setMensagemErro('Erro ao deletar evento.');
     }
   };
 
@@ -168,5 +209,7 @@ export function useEvent() {
     eventoEditando,
     usuarios,
     locais,
+    mensagemErro,
+    erros,
   };
 }

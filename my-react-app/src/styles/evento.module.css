@@ -1,4 +1,4 @@
-.locaisContainer {
+.eventContainer {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 1rem;
@@ -7,7 +7,7 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.locaisTitulo {
+.eventTitle {
   font-size: 1.8rem;
   margin-bottom: 1rem;
   color: var(--color-primary-dark);
@@ -31,7 +31,7 @@
   background-color: var(--color-primary-light);
 }
 
-.locaisForm {
+.eventForm {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -42,14 +42,16 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
-.locaisLabel {
+.eventLabel {
   display: flex;
   flex-direction: column;
   font-weight: 500;
   color: var(--color-primary-dark);
 }
 
-.locaisInput {
+.eventInput,
+.select,
+textarea {
   padding: 0.6rem 1rem;
   margin-top: 0.3rem;
   border-radius: 6px;
@@ -58,55 +60,14 @@
   transition: border-color 0.2s;
 }
 
-.locaisInput:focus {
+.eventInput:focus,
+.select:focus,
+textarea:focus {
   outline: none;
   border-color: var(--color-primary);
 }
 
-.readonlyField {
-  background-color: var(--color-gray);
-}
-
-.fieldsetEndereco {
-  border: 1px solid var(--color-gray-dark);
-  border-radius: 6px;
-  padding: 1rem;
-}
-
-.legendEndereco {
-  font-weight: 600;
-  color: var(--color-primary-dark);
-}
-
-.cepContainer {
-  display: flex;
-  flex-direction: column;
-}
-
-.cepInputContainer {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.cepInputContainer input {
-  flex: 1;
-}
-
-.cepInputContainer button {
-  padding: 0.4rem 0.8rem;
-  background-color: var(--color-secondary);
-  color: var(--color-white);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.cepInputContainer button:hover {
-  background-color: var(--color-secondary-light);
-}
-
-.locaisSubmit {
+.eventSubmit {
   padding: 0.6rem 1rem;
   border: none;
   border-radius: 6px;
@@ -117,32 +78,42 @@
   transition: background-color 0.2s;
 }
 
-.locaisSubmit:hover {
+.eventSubmit:hover {
   background-color: var(--color-primary-light);
 }
 
-.locaisLista {
+.eventList {
   margin-top: 2rem;
 }
 
-.locaisLista ul {
+.eventList ul {
   list-style: none;
   padding: 0;
 }
 
-.locaisLista li {
+.eventList li {
   padding: 0.8rem;
   margin-bottom: 0.5rem;
   background-color: var(--color-white);
   border-radius: 6px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  flex-wrap: wrap;
 }
 
-.locaisLista li button {
-  margin-left: 0.5rem;
+.eventInfo {
+  flex: 1;
+}
+
+.eventActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.eventActions button {
   padding: 0.3rem 0.6rem;
   border: none;
   border-radius: 4px;
@@ -150,44 +121,61 @@
   font-weight: 500;
 }
 
-.locaisLista li button:first-of-type {
+.eventActions button:first-of-type {
   background-color: var(--color-primary);
   color: var(--color-white);
 }
 
-.locaisLista li button:first-of-type:hover {
+.eventActions button:first-of-type:hover {
   background-color: var(--color-primary-light);
 }
 
-.locaisLista li button:last-of-type {
+.eventActions button:last-of-type {
   background-color: var(--color-secondary);
   color: var(--color-white);
 }
 
-.locaisLista li button:last-of-type:hover {
+.eventActions button:last-of-type:hover {
   background-color: var(--color-secondary-light);
 }
 
 @media (max-width: 768px) {
-  .locaisContainer {
+  .eventContainer {
     padding: 1rem;
   }
 
-  .cepInputContainer {
-    flex-direction: column;
-  }
-
-  .cepInputContainer button {
-    width: 100%;
-  }
-
-  .locaisLista li {
+  .eventList li {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .locaisLista li button {
-    margin: 0.3rem 0 0 0;
-    margin-right: 10px;
+  .eventActions {
+    flex-wrap: wrap;
   }
+
+  .eventActions button {
+    margin-top: 0.3rem;
+  }
+}
+
+.errorMessage {
+  color: var(--color-secondary);
+  background-color: rgba(200, 123, 61, 0.15); 
+  border: 1px solid var(--color-secondary);
+  
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-align: center;
+  
+  width: 100%; 
+}
+
+.fieldError {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  font-weight: 500;
 }

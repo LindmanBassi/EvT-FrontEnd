@@ -1,4 +1,4 @@
-import { buildUrl } from './apiConfig';
+import { buildUrl } from './configApi';
 
 export async function loginUsuario(email, senha) {
   const res = await fetch(buildUrl('/auth/login'), {
@@ -7,7 +7,9 @@ export async function loginUsuario(email, senha) {
     credentials: 'include',
     body: JSON.stringify({ email, senha }),
   });
-  if (!res.ok) throw new Error('E-mail ou senha inválidos.');
+
+  if (!res.ok) throw res;
+
   const data = await res.json();
   try {
     if (data?.token) localStorage.setItem('token', data.token);
@@ -20,6 +22,6 @@ export async function logoutUsuario() {
     method: 'POST',
     credentials: 'include',
   });
-  if (!res.ok) throw new Error('Erro ao fazer logout');
+  if (!res.ok) throw res;
   return true;
 }

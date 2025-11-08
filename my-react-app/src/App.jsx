@@ -2,10 +2,10 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LocalPage from './pages/LocalPage';
 import LoginPage from './pages/LoginPage';
-import HomePage from './pages/HomePage';
-import EventPage from './pages/EventPage';
+import EventoPage from './pages/EventoPage';
+import FuncionariosPage from './pages/FuncionariosPage';
+import ParticipacaoPage from './pages/ParticipacaoPage';
 
-// Componente para rotas protegidas
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -24,7 +24,7 @@ function App() {
           path="/home"
           element={
             <ProtectedRoute>
-              <HomePage />
+              <ParticipacaoPage />
             </ProtectedRoute>
           }
         />
@@ -40,7 +40,23 @@ function App() {
           path="/eventos"
           element={
             <ProtectedRoute>
-              <EventPage />
+              <EventoPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/funcionarios"
+          element={
+            <ProtectedRoute>
+              <FuncionariosPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/participacoes"
+          element={
+            <ProtectedRoute>
+              <ParticipacaoPage />
             </ProtectedRoute>
           }
         />

@@ -1,10 +1,10 @@
-import { buildUrl } from './apiConfig';
+import { buildUrl } from './configApi';
 
 export async function getUsuarios() {
   const res = await fetch(buildUrl('/usuarios'), {
     credentials: 'include',
   });
-  if (!res.ok) throw new Error('Erro ao buscar usuários');
+  if (!res.ok) throw res;
   return res.json();
 }
 
@@ -15,10 +15,8 @@ export async function criarUsuario({ nome, email, senha, cpf }) {
     body: JSON.stringify({ nome, email, senha, cpf }),
     credentials: 'include',
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `Erro ao criar usuário (status ${res.status})`);
-  }
+  if (!res.ok) throw res;
+
   return res.json();
 }
 
@@ -29,10 +27,8 @@ export async function editarUsuario(id, { nome, email, senha, cpf }) {
     body: JSON.stringify({ nome, email, senha, cpf }),
     credentials: 'include',
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `Erro ao editar usuário (status ${res.status})`);
-  }
+  if (!res.ok) throw res;
+
   return res.json();
 }
 
@@ -41,9 +37,7 @@ export async function deletarUsuario(id) {
     method: 'DELETE',
     credentials: 'include',
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `Erro ao deletar usuário (status ${res.status})`);
-  }
+  if (!res.ok) throw res;
+
   return true;
 }

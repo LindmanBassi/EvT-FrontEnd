@@ -1,4 +1,4 @@
-import { buildUrl } from './apiConfig';
+import { buildUrl } from './configApi';
 
 export async function getLocais() {
   const res = await fetch(buildUrl('/locais'), {});

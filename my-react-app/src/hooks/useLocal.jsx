@@ -25,7 +25,6 @@ export function useLocal() {
     endereco: {
       cep: '',
       numero: '',
-      // Additional fields for display only
       rua: '',
       bairro: '',
       cidade: '',
@@ -53,7 +52,6 @@ export function useLocal() {
   }, []);
 
   const handleBuscarCep = async (cep) => {
-    // Remove caracteres não numéricos do CEP
     const cepLimpo = cep.replace(/\D/g, '');
 
     if (!cepLimpo || cepLimpo.length !== 8) {
@@ -90,10 +88,8 @@ export function useLocal() {
     if (name in formData.endereco) {
       let formattedValue = value;
       if (name === 'cep') {
-        // Remove caracteres não numéricos
         formattedValue = value.replace(/\D/g, '');
       } else if (name === 'numero') {
-        // Converte para número se não estiver vazio
         formattedValue = value === '' ? '' : parseInt(value, 10);
       }
 
@@ -112,7 +108,7 @@ export function useLocal() {
       const payload = {
         nome: formData.nome,
         endereco: {
-          cep: formData.endereco.cep.replace(/\D/g, ''), // Remove formatação do CEP
+          cep: formData.endereco.cep.replace(/\D/g, ''),
           numero: Number(formData.endereco.numero) || 0,
         },
         capacidade: Number(formData.capacidade) || 1,
