@@ -1,38 +1,48 @@
+import { buildUrl } from './configApi';
+
 export async function getEventos() {
-  const res = await fetch('http://localhost:8080/eventos', {
+  const res = await fetch(buildUrl('/eventos'), {
     credentials: 'include',
   });
-  if (!res.ok) throw new Error('Erro ao buscar eventos');
+  if (!res.ok) throw res;
+  return res.json();
+}
+
+export async function getEvento(id) {
+  const res = await fetch(buildUrl(`/eventos/${id}`), {
+    credentials: 'include',
+  });
+  if (!res.ok) throw res;
   return res.json();
 }
 
 export async function editarEvento(id, evento) {
-  const res = await fetch(`http://localhost:8080/eventos/${id}`, {
+  const res = await fetch(buildUrl(`/eventos/${id}`), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(evento),
   });
-  if (!res.ok) throw new Error('Erro ao editar evento');
+  if (!res.ok) throw res;
   return res.json();
 }
 
 export async function criarEvento(evento) {
-  const res = await fetch('http://localhost:8080/eventos', {
+  const res = await fetch(buildUrl('/eventos'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(evento),
   });
-  if (!res.ok) throw new Error('Erro ao criar evento');
+  if (!res.ok) throw res;
   return res.json();
 }
 
 export async function deletarEvento(id) {
-  const res = await fetch(`http://localhost:8080/eventos/${id}`, {
+  const res = await fetch(buildUrl(`/eventos/${id}`), {
     method: 'DELETE',
     credentials: 'include',
   });
-  if (!res.ok) throw new Error('Erro ao deletar evento');
+  if (!res.ok) throw res;
   return true;
 }
