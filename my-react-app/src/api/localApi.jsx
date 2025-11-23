@@ -21,8 +21,22 @@ export async function criarLocal(local) {
     },
     body: JSON.stringify(local),
   });
-  if (!res.ok) throw new Error('Erro ao criar local');
-  return res.json();
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    // Se vier erros de validação do backend
+    if (data?.erros) {
+      throw {
+        type: 'validation',
+        erros: data.erros,
+      };
+    }
+
+    throw new Error(data?.mensagem || 'Erro ao criar local');
+  }
+
+  return data;
 }
 
 export async function editarLocal(id, local) {
@@ -34,15 +48,36 @@ export async function editarLocal(id, local) {
     },
     body: JSON.stringify(local),
   });
-  if (!res.ok) throw new Error('Erro ao editar local');
-  return res.json();
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    if (data?.erros) {
+      throw {
+        type: 'validation',
+        erros: data.erros,
+      };
+    }
+
+    throw new Error(data?.mensagem || 'Erro ao editar local');
+  }
+
+  return data;
 }
 
 export async function deletarLocal(id) {
   const res = await fetch(buildUrl(`/locais/${id}`), {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+    },
   });
-  if (!res.ok) throw new Error('Erro ao deletar local');
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(data?.mensagem || 'Erro ao deletar local');
+  }
+
   return true;
 }

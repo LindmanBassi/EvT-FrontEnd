@@ -6,96 +6,61 @@ import {
   deletarLocal,
 } from '../api/localApi';
 
-const buscarCepViaCep = async (cep) => {
-  try {
-    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-    if (!response.ok) {
-      throw new Error('CEP não encontrado');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Erro ao buscar CEP:', error);
-    throw error;
-  }
-};
-
 export function useLocal() {
+  const [locais, setLocais] = useState([]);
+  const [localEditando, setLocalEditando] = useState(null);
+  const [mensagemLocal, setMensagemLocal] = useState({ text: '', type: '' });
+
   const [formData, setFormData] = useState({
     nome: '',
+    capacidade: '',
     endereco: {
       cep: '',
-      numero: '',
       rua: '',
       bairro: '',
+      numero: '',
       cidade: '',
       estado: '',
     },
-    capacidade: '',
   });
 
-  const [locais, setLocais] = useState([]);
-  const [localEditando, setLocalEditando] = useState(null);
-
-  useEffect(() => {
-    async function fetchLocais() {
-      try {
-        const data = await getLocais();
-        const normalized = Array.isArray(data)
-          ? data.map((l, i) => ({ ...l, id: l.id ?? l._id ?? `tmp-${i}` }))
-          : [];
-        setLocais(normalized);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    fetchLocais();
-  }, []);
-
-  const handleBuscarCep = async (cep) => {
-    const cepLimpo = cep.replace(/\D/g, '');
-
-    if (!cepLimpo || cepLimpo.length !== 8) {
-      alert('Por favor, insira um CEP válido com 8 dígitos');
-      return;
-    }
-
+  // Mantida como estava
+  const buscarCepViaCep = async (cep) => {
     try {
-      const dadosCep = await buscarCepViaCep(cepLimpo);
-      if (dadosCep.erro) {
-        alert('CEP não encontrado');
-        return;
-      }
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      if (!response.ok) throw new Error('CEP não encontrado');
 
-      setFormData((prev) => ({
-        ...prev,
-        endereco: {
-          ...prev.endereco,
-          cep: cepLimpo.replace(/(\d{5})(\d{3})/, '$1-$2'),
-          rua: dadosCep.logradouro || '',
-          bairro: dadosCep.bairro || '',
-          cidade: dadosCep.localidade || '',
-          estado: dadosCep.uf || '',
-        },
-      }));
+      return await response.json();
     } catch (error) {
-      alert('Erro ao buscar o CEP');
-      console.error(error);
+      console.error('Erro ao buscar CEP:', error);
+      throw error;
     }
   };
 
+  const fetchLocais = async () => {
+    try {
+      const data = await getLocais();
+      setLocais(data);
+    } catch (error) {
+      console.error('Erro ao buscar locais:', error);
+      setMensagemLocal({
+        text: 'Erro ao carregar os locais.',
+        type: 'error',
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchLocais();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name in formData.endereco) {
-      let formattedValue = value;
-      if (name === 'cep') {
-        formattedValue = value.replace(/\D/g, '');
-      } else if (name === 'numero') {
-        formattedValue = value === '' ? '' : parseInt(value, 10);
-      }
 
+    if (name in formData.endereco) {
       setFormData((prev) => ({
         ...prev,
-        endereco: { ...prev.endereco, [name]: formattedValue },
+        endereco: { ...prev.endereco, [name]: value },
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -104,51 +69,87 @@ export function useLocal() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const payload = {
-        nome: formData.nome,
-        endereco: {
-          cep: formData.endereco.cep.replace(/\D/g, ''),
-          numero: Number(formData.endereco.numero) || 0,
-        },
-        capacidade: Number(formData.capacidade) || 1,
-      };
+    setMensagemLocal({ text: '', type: '' });
 
+    try {
       if (localEditando) {
-        await editarLocal(localEditando.id, payload);
-        const data = await getLocais();
-        const normalized = Array.isArray(data)
-          ? data.map((l, i) => ({ ...l, id: l.id ?? l._id ?? `tmp-${i}` }))
-          : [];
-        setLocais(normalized);
-        setLocalEditando(null);
+        await editarLocal(localEditando.id, formData);
+        setMensagemLocal({
+          text: 'Local atualizado com sucesso!',
+          type: 'success',
+        });
       } else {
-        await criarLocal(payload);
-        const atualizados = await getLocais();
-        const normalized = Array.isArray(atualizados)
-          ? atualizados.map((l, i) => ({
-              ...l,
-              id: l.id ?? l._id ?? `tmp-${i}`,
-            }))
-          : [];
-        setLocais(normalized);
+        await criarLocal(formData);
+        setMensagemLocal({
+          text: 'Local criado com sucesso!',
+          type: 'success',
+        });
       }
 
-      setFormData({
-        nome: '',
-        endereco: {
-          cep: '',
-          numero: '',
-          rua: '',
-          bairro: '',
-          cidade: '',
-          estado: '',
-        },
-        capacidade: '',
-      });
+      await fetchLocais();
+      setLocalEditando(null);
+      resetForm();
     } catch (error) {
-      console.error(error);
-      alert('Erro ao salvar local.');
+      console.error('Erro ao salvar local:', error);
+
+      // VALIDATION ERROR (igual o de participação)
+      if (error.type === 'validation' && error.erros) {
+        const firstError = Object.values(error.erros)[0]; // primeira mensagem do objeto
+        setMensagemLocal({ text: firstError, type: 'error' });
+        return;
+      }
+
+      setMensagemLocal({
+        text: error.message || 'Erro ao salvar local.',
+        type: 'error',
+      });
+    }
+  };
+
+  const handleDeletar = async (id) => {
+    try {
+      await deletarLocal(id);
+      setMensagemLocal({
+        text: 'Local deletado com sucesso!',
+        type: 'success',
+      });
+      await fetchLocais();
+    } catch (error) {
+      console.error('Erro ao deletar local:', error);
+
+      setMensagemLocal({
+        text: error.message || 'Erro ao deletar local.',
+        type: 'error',
+      });
+    }
+  };
+
+  const handleBuscarCep = async (cep) => {
+    try {
+      const data = await buscarCepViaCep(cep);
+
+      if (data.erro) {
+        setMensagemLocal({ text: 'CEP não encontrado.', type: 'error' });
+        return;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        endereco: {
+          ...prev.endereco,
+          rua: data.logradouro || '',
+          bairro: data.bairro || '',
+          cidade: data.localidade || '',
+          estado: data.uf || '',
+        },
+      }));
+
+      setMensagemLocal({ text: '', type: '' });
+    } catch (error) {
+      setMensagemLocal({
+        text: 'Erro ao buscar o CEP.',
+        type: 'error',
+      });
     }
   };
 
@@ -157,24 +158,30 @@ export function useLocal() {
     setFormData(local);
   };
 
-  const handleDeletar = async (id) => {
-    try {
-      await deletarLocal(id);
-      setLocais((prev) => prev.filter((l) => l.id !== id));
-    } catch (err) {
-      console.error(err);
-      alert('Erro ao deletar local.');
-    }
+  const resetForm = () => {
+    setFormData({
+      nome: '',
+      capacidade: '',
+      endereco: {
+        cep: '',
+        rua: '',
+        bairro: '',
+        numero: '',
+        cidade: '',
+        estado: '',
+      },
+    });
   };
 
   return {
+    locais,
     formData,
     handleChange,
     handleSubmit,
-    locais,
     iniciarEdicao,
     handleDeletar,
-    localEditando,
     handleBuscarCep,
+    localEditando,
+    mensagemLocal,
   };
 }

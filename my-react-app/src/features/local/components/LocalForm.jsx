@@ -12,6 +12,7 @@ function LocalComponent() {
     handleDeletar,
     localEditando,
     handleBuscarCep,
+    mensagemLocal,
   } = useLocal();
 
   const [mostrarForm, setMostrarForm] = useState(false);
@@ -26,6 +27,18 @@ function LocalComponent() {
           {mostrarForm ? 'Fechar Formulário' : 'Expandir Formulário'}
         </button>
       </div>
+
+      {mensagemLocal.text && (
+        <div
+          className={
+            mensagemLocal.type === 'error'
+              ? styles.errorMessage
+              : styles.successMessage
+          }
+        >
+          {mensagemLocal.text}
+        </div>
+      )}
 
       {mostrarForm && (
         <form onSubmit={handleSubmit} className={styles.locaisForm}>

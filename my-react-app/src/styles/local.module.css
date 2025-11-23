@@ -168,6 +168,47 @@
   background-color: var(--color-secondary-light);
 }
 
+/* ========================= */
+/*  🔥 ADICIONADO: MENSAGENS */
+/* ========================= */
+
+.errorMessage {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  background-color: #fdd;
+  color: #e74c3c;
+  border: 1px solid #f99;
+  font-weight: 500;
+}
+
+.successMessage {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  background-color: #ddf;
+  color: #080;
+  border: 1px solid #9c9;
+  font-weight: 500;
+}
+
+.detailsBox {
+  padding: 1rem;
+  background-color: #f7f7f7;
+  border-left: 5px solid var(--color-primary);
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.detailsBox p {
+  margin: 0.25rem 0;
+  color: var(--color-gray-dark);
+}
+
+.detailsBox strong {
+  color: var(--color-primary-dark);
+}
+
 @media (max-width: 768px) {
   .locaisContainer {
     padding: 1rem;

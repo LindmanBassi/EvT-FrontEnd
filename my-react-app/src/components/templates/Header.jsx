@@ -30,8 +30,8 @@ export function Header() {
     }
   };
 
-  const isVisitante = userData?.role === 'VISITANTE';
   const isFuncionario = userData && userData.role !== 'VISITANTE';
+  const isGerente = userData?.role === 'GERENTE';
 
   return (
     <header className={styles.header}>
@@ -48,12 +48,16 @@ export function Header() {
               <Link to="/locais" className={styles.navLink}>
                 Locais
               </Link>
+
               <Link to="/eventos" className={styles.navLink}>
                 Eventos
               </Link>
-              <Link to="/funcionarios" className={styles.navLink}>
-                Funcionários
-              </Link>
+
+              {isGerente && (
+                <Link to="/funcionarios" className={styles.navLink}>
+                  Funcionários
+                </Link>
+              )}
             </>
           )}
         </nav>
