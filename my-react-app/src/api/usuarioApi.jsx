@@ -8,27 +8,35 @@ export async function getUsuarios() {
   return res.json();
 }
 
-export async function criarUsuario({ nome, email, senha, cpf }) {
-  const res = await fetch(buildUrl('/usuarios'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nome, email, senha, cpf }),
+export async function getUsuario(id) {
+  const res = await fetch(buildUrl(`/usuarios/${id}`), {
     credentials: 'include',
   });
   if (!res.ok) throw res;
-
   return res.json();
 }
 
-export async function editarUsuario(id, { nome, email, senha, cpf }) {
+export async function criarUsuario(usuario) {
+  const res = await fetch(buildUrl('/usuarios'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(usuario),
+  });
+
+  if (!res.ok) throw res;
+  return res.json();
+}
+
+export async function editarUsuario(id, usuario) {
   const res = await fetch(buildUrl(`/usuarios/${id}`), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nome, email, senha, cpf }),
     credentials: 'include',
+    body: JSON.stringify(usuario),
   });
-  if (!res.ok) throw res;
 
+  if (!res.ok) throw res;
   return res.json();
 }
 
@@ -37,7 +45,7 @@ export async function deletarUsuario(id) {
     method: 'DELETE',
     credentials: 'include',
   });
-  if (!res.ok) throw res;
 
+  if (!res.ok) throw res;
   return true;
 }

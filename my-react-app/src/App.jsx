@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import EventoPage from './pages/EventoPage';
 import FuncionariosPage from './pages/FuncionariosPage';
 import ParticipacaoPage from './pages/ParticipacaoPage';
+import UsuarioPage from './pages/UsuarioPage';
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -57,6 +58,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ParticipacaoPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/usuarios"
+          element={
+            <ProtectedRoute>
+              <UsuarioPage />
             </ProtectedRoute>
           }
         />

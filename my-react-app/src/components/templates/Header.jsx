@@ -54,9 +54,14 @@ export function Header() {
               </Link>
 
               {isGerente && (
-                <Link to="/funcionarios" className={styles.navLink}>
-                  Funcionários
-                </Link>
+                <>
+                  <Link to="/funcionarios" className={styles.navLink}>
+                    Funcionários
+                  </Link>
+                  <Link to="/usuarios" className={styles.navLink}>
+                    Usuários
+                  </Link>
+                </>
               )}
             </>
           )}
