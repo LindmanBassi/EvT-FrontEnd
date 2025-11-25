@@ -1,5 +1,10 @@
 import { buildUrl } from './configApi';
 
+function authHeader() {
+  const token = localStorage.getItem('token');
+  return { Authorization: `Bearer ${token}` };
+}
+
 async function handleResponse(res) {
   if (!res.ok) {
     throw res;
@@ -9,7 +14,7 @@ async function handleResponse(res) {
   const text = await res.text();
   try {
     data = text ? JSON.parse(text) : null;
-  } catch (err) {
+  } catch {
     data = null;
   }
 
@@ -19,8 +24,11 @@ async function handleResponse(res) {
 export async function participarDoEvento(tituloEvento) {
   const res = await fetch(buildUrl('/participacoes'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader(),
+    },
     body: JSON.stringify({ tituloEvento }),
   });
 
@@ -30,6 +38,9 @@ export async function participarDoEvento(tituloEvento) {
 export async function getMeusEventos() {
   const res = await fetch(buildUrl('/participacoes/meus-eventos'), {
     credentials: 'include',
+    headers: {
+      ...authHeader(),
+    },
   });
 
   return handleResponse(res);
@@ -40,6 +51,9 @@ export async function getUsuariosPorEvento(eventoId) {
     buildUrl(`/participacoes/evento/${eventoId}/usuarios`),
     {
       credentials: 'include',
+      headers: {
+        ...authHeader(),
+      },
     },
   );
 
